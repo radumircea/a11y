@@ -1,46 +1,75 @@
-function Modal(modal, open, close) {
-    this.modal = modal;
-    this.openBtn = document.querySelector(open);
-    this.closeBtn =
-        modal.querySelector(close) || modal.querySelector(".modal__close");
-    this.overlay = modal.querySelector(".modal__overlay");
+function Modal(modal, trigger) {
+    //internal
     const focusable =
-        "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex], [contentEditable]";
-    this.focusables = Array.prototype.slice.call(
-        modal.querySelectorAll(focusable)
-    );
-    this.firstFocus = this.focusables[0];
-    this.lastFocus = this.focusables[this.focusables.length - 1];
-    this.openBtn.addEventListener("click", this.openHandler.bind(this));
-    this.closeBtn.addEventListener("click", this.closeHandler.bind(this));
-    this.overlay.addEventListener("click", this.closeHandler.bind(this));
-    this.modal.addEventListener("keyup", this.closeHandler.bind(this));
-    this.lastFocus.addEventListener("keydown", this.trapFocus.bind(this));
-    this.firstFocus.addEventListener("keydown", this.trapFocus.bind(this));
+        "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex], [contentEditable]",
+        focusables = Array.prototype.slice.call(
+            modal.querySelectorAll(focusable)
+        ),
+        extras = {
+            create: function(action, _this) {
+                return function (e) {
+                    if (action._if(e)) _this[action._do]();
+                };
+            },
+            escKey: {
+                _if: function (e) {
+                    return e.key === "Escape";
+                },
+                _do: "close"
+            }
+        };
+    //refs
+    this.modal = modal;
+    this.openBtn = document.querySelector(trigger);
+    this.closeBtn = this.modal.querySelector(".modal__close");
+    this.overlay = this.modal.querySelector(".modal__overlay");
+    this.first = focusables[0];
+    this.last = focusables[focusables.length - 1];
+
+    this.modal.setAttribute("tabindex", "-1");
+    //open
+    this.openBtn.addEventListener("click", this.open.bind(this));
+    //close
+    this.closeBtn.addEventListener("click", this.close.bind(this));
+    this.overlay.addEventListener("click", this.close.bind(this));
+    this.modal.addEventListener("keyup", extras.create(extras.escKey, this));
+    // this.modal.addEventListener("keyup", this.closeEsc.bind(this));
+    //trap focus
+    this.first.addEventListener("keydown", this.trap.bind(this));
+    this.last.addEventListener("keydown", this.trap.bind(this));
 }
 
-Modal.prototype.openHandler = function () {
-    this.previousFocus = document.activeElement;
-    this.modal.classList.toggle("modal--open");
-    this.modal.focus();
+Modal.prototype.open = function () {
+    this.prevFocus = document.activeElement;
+    this.modal.classList.add("modal--open");
+    this.modal.focus(); //instead of focusing on first focusable
 };
 
-Modal.prototype.closeHandler = function (e) {
-    //trigger: click + keyup
-    if (e.type === "keyup" && !e.key === "Esc") return;
-    this.modal.classList.toggle("modal--open");
-    this.previousFocus.focus();
-    this.previousFocus = null;
+Modal.prototype.close = function () {
+    this.modal.classList.remove("modal--open");
+    this.prevFocus.focus();
 };
 
-Modal.prototype.trapFocus = function (e) {
-    if (e.keyCode === 9) {
-        if (e.shiftKey && e.currentTarget === this.firstFocus) {
-            e.preventDefault();
-            this.lastFocus.focus();
-        } else if (e.currentTarget === this.lastFocus) {
-            e.preventDefault();
-            this.firstFocus.focus();
+Modal.prototype.closeEsc = function (e) {
+    if (e.key === "Escape") {
+        e.preventDefault();
+        this.close();
+    }
+};
+
+Modal.prototype.trap = function (e) {
+    console.log(e.key);
+    if (e.key === "Tab") {
+        if (e.shiftKey) {
+            if (document.activeElement === this.first) {
+                e.preventDefault();
+                this.last.focus();
+            }
+        } else {
+            if (document.activeElement === this.last) {
+                e.preventDefault();
+                this.first.focus();
+            }
         }
     }
 };
