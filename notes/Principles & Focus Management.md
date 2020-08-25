@@ -15,7 +15,7 @@ WCAG Principles: POUR - Perceivable | Operable | Understandable | Robust
 Focusable elements are elements that imply user interaction. These are either default (links, buttons, form elements etc.) or defined - by using tabindex.  
 Tabbable elements are elements that receive focus through tab navigation.  
 However, there is a slight difference between the terms, exemplified through the use of "tabindex"  
-"tabindex" ensures focusability, but not tabbability - tabindex="-1" defines an element as focusable, but does not register the element in the so-called "tab order".
+"tabindex" ensures focusability, but not "tabbability" - tabindex="-1" defines an element as focusable, but does not register the element in the so-called "tab order".
 The element can receive focus programmatically.  
   
 (!) Safari - for correct tab navigation, need to check a setting in Preferences  
