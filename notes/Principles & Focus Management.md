@@ -8,7 +8,7 @@ WCAG Principles: POUR - Perceivable | Operable | Understandable | Robust
 **Understandable** - can users understand content and the interface? is interface consistent enough to avoid confusion?  
 **Robust** - Content can be interpreted by by a wide variety of user agents, including assistive technologies.  
 
-(!) Always keep in actual user experience.
+(!) Always keep in mind actual user experience.
 
 **Focus**  
 *"focusable"* vs. *"tabbable"*  
